@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,6 +10,7 @@
   <link rel="stylesheet" href="./css/style.css">
   <title>Document</title>
 </head>
+
 <body>
   <div class="wrapper" id="wrapper">
     <button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>
@@ -16,6 +18,93 @@
   <script src="../../common/js/jquery.js"></script>
   <script>
     // 回答はここに書いてね
+
+    $(document).on('click', "#pokemon_search", function () {
+      let result = Math.floor(Math.random() * 151) + 1;
+
+      $.ajax({
+        url: `https://pokeapi.co/api/v2/pokemon/${result}`,
+        method: 'GET'
+      })
+
+        .done(function (res) {
+
+          let img = res.sprites.front_default
+          $.ajax({
+            url: `https://pokeapi.co/api/v2/pokemon-species/${result}/`,
+            method: 'GET'
+
+          })
+            .done(function (res) {
+
+              let firstpege = '<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>'
+
+              let pokeJapanName = res.names[0].name
+
+              let encountHtml =
+                `
+          <p class="name">${pokeJapanName}</p>
+          <div>
+            <img class="img" src="${img}" alt="">
+          </div>
+          <div>
+            <button class="btn" id="catch">捕まえる</button>
+            <button class="btn" data-js="reset">逃げる</button>
+          </div>
+         `
+              $('.wrapper').html(encountHtml);
+              $(".btn").click(function () {
+                let firstHtml = '<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>'
+                $('.wrapper').html(firstHtml);
+              })
+              $('#catch').click(function () {
+                $.ajax({
+                  url: 'https://pokeapi.co/api/v2/item/4',
+                  method: 'GET'
+                }).done(function (res) {
+                  let pokeball = res.sprites.default
+                  let result = Math.floor(Math.random() * 2) + 1;
+                  if (result === 1) {
+                    let doneHtml =
+                      `
+              <p class="name">ゲットしました</p>
+              <div>
+                <img class="img" src="${pokeball}" alt="">
+              </div>
+              <button class="btn" data-js="reset">戻る</button>
+             `
+
+                    $('.wrapper').html(doneHtml);
+                    $(".btn").click(function () {
+                      let firstHtml = firstpege
+                      $('.wrapper').html(firstHtml);
+                    });
+                  } else {
+
+                    let failHtml =
+                      `
+              <p class="text">逃げられてしまった...</p>
+              <button class="btn mt" data-js="reset">戻る</button>`
+
+                    $('.wrapper').html(failHtml);
+
+                    $(".btn").click(function () {
+                      let firstHtml = firstpege
+                      $('.wrapper').html(firstHtml);
+                    });
+                  };
+
+                }).fail(function (err) {
+                }).fail(function (err) {
+                }).fail(function (err) {
+                })
+              })
+            })
+        })
+    })
+
+
   </script>
 </body>
+
 </html>
